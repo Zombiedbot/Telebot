@@ -32,6 +32,14 @@ def game(message):
 def snake_game(message):
     global d
     global kk
+    kb = types.InlineKeyboardMarkup()
+    button = types.InlineKeyboardButton(text = 'up', callback_data = 'u')
+    kb.add(button)
+    button1 = types.InlineKeyboardButton(text = 'right', callback_data = 'r')
+    button = types.InlineKeyboardButton(text = 'left', callback_data = 'l')
+    kb.row(button, button1)
+    button = types.InlineKeyboardButton(text = 'down', callback_data = 'd')
+    kb.add(button)
     F, S, d, h, p = snake.init()
     t = time.clock()
     tr = 1
@@ -41,8 +49,7 @@ def snake_game(message):
         for j in i:
             txt = txt + j
         txt = txt + '\n'
-    #markup = utils.generate_markup(['up', 'right', 'left', 'down'])
-    msg = bot.send_message(chat_id = message.chat.id, text = txt)
+    msg = bot.send_message(chat_id = message.chat.id, text = txt, reply_markup = kb)
     while tr:
         tt = trunc(time.clock() * 1)
         h = S[0]
@@ -55,8 +62,8 @@ def snake_game(message):
                 for j in i:
                     txt = txt + j
                 txt = txt + '\n'
-            bot.edit_message_text(chat_id = msg.chat.id, message_id = msg.message_id, text = txt)
-
+            bot.edit_message_text(chat_id = msg.chat.id, message_id = msg.message_id, text = txt, reply_markup = kb)
+    d = 0
 
         
 
@@ -66,31 +73,29 @@ def stats(message):
     r, w = utils.get_stats(user)
     bot.send_message(message.chat.id, 'Вы ответили на %i вопросов правильно и на %i - неправильно' % (r, w))
 
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    if call.message:
+        global d
+        global kk
+        if not d:
+            check_answer(call.message)
+        elif call.data == 'u' and kk and d != 'd':
+            d = 'u'
+            kk = 0
+        elif call.data == 'd' and kk and d != 'u':
+            d = 'd'
+            kk = 0
+        elif call.data == 'l' and kk and d != 'r':
+            d = 'l'
+            kk = 0
+        elif call.data == 'r' and kk and d != 'l':
+            d = 'r'
+            kk = 0 
+
+
 @bot.message_handler(func=lambda f: True, content_types=['text'])
 def check_answer(message):
-    st = message.text
-    global d
-    global kk
-    if st == 'u' and kk and d != 'd': 
-        d = 'u'
-        kk = 0
-        bot.delete_message(chat_id = message.chat.id, message_id = message.message_id)
-        return 0
-    elif st == 'd' and kk and d != 'u':
-        d = 'd'
-        kk = 0
-        bot.delete_message(chat_id = message.chat.id, message_id = message.message_id)
-        return 0
-    elif st == 'l' and kk and d != 'r':
-        d = 'l'
-        kk = 0
-        bot.delete_message(chat_id = message.chat.id, message_id = message.message_id)
-        return 0
-    elif st == 'r' and kk and d != 'l':
-        d = 'r'
-        kk = 0
-        bot.delete_message(chat_id = message.chat.id, message_id = message.message_id)
-        return 0
     answer = utils.get_answer_for_user(message.chat.id)
     if not answer:
         bot.send_message(message.chat.id, 'Что бы начать игру введите /game')
