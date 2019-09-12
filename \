@@ -16,13 +16,14 @@ kb = types.InlineKeyboardMarkup()
 class Snake_thread(Thread):
     def run(self):
         while True:
-            print(queue)
+            print(1)
             if queue:
                 tim = queue[0][1]
                 mes = queue[0][0]
                 tt = trunc(time.clock())
                 if tt > tim:
                     t = make_step(mes)
+                    print(t)
                     del(queue[0])
                     if t:
                         queue.append([mes, tim + 1])
@@ -67,7 +68,7 @@ def snake_game(message):
     t = trunc(time.clock() )
     F, S, d, h, p, kk, step = tup
     print(step)
-    t = trunc(time.clock())
+    t = trunc(time.clock() * 2)
     txt = ''
     for i in F:
         for j in i:

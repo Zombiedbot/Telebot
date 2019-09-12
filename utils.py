@@ -2,7 +2,7 @@ import shelve
 from random import shuffle
 from telebot import types
 from DataBase import DBase
-from config import shelve_name, database_name, stats_name
+from config import snake_db, shelve_name, database_name, stats_name
 
 def count_rows():
     db = DBase(database_name)
@@ -24,8 +24,24 @@ def set_user_game(chat_id, estimated_answer, user):
     with shelve.open(shelve_name) as storage:
         storage[str(chat_id)] = estimated_answer
 
+def set_snake_game(sid, tools):
+    with shelve.open(snake_db) as storage:
+        storage[str(sid)] = tools
 
-def finish_user_game(chat_id): 
+def get_snake_game(sid):
+    with shelve.open(snake_db) as storage:
+        try:
+            t = storage[str(sid)]
+            return t
+        except:
+            return None
+
+def finish_snake_game(sid):
+    with shelve.open(snake_db) as storage:
+        del storage[str(sid)]
+
+
+def finish_user_game(chat_id):
     with shelve.open(shelve_name) as storage:
         del storage[str(chat_id)]
 
